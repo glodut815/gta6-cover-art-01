@@ -3,126 +3,134 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Neon Vice Cover Studio</title>
+<title>Neon Vice Cover Studio — GTA 6 Cover Art Maker</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="top">
-  <div>
-    <h1>Neon Vice <span>Cover Studio</span></h1>
-    <p class="tagline">Turn any photo and a caption into GTA-style cover art. Your photos never leave this machine.</p>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">NV</span>
+    <div>
+      <h1>Neon Vice Cover Studio</h1>
+      <p>Turn any photo into GTA 6-style poster cover art. 100% offline — your photos never leave this machine.</p>
+    </div>
   </div>
-  <div class="top-badge">OFFLINE &middot; PNG EXPORT</div>
+  <div class="top-actions">
+    <label class="btn primary" for="upload">Upload photo</label>
+    <input id="upload" type="file" accept="image/*" hidden>
+    <button class="btn" id="sample-sunset" type="button">Sample: Sunset Valley</button>
+    <button class="btn" id="sample-skyline" type="button">Sample: City Alley</button>
+  </div>
 </header>
 
 <main class="workspace">
-  <aside class="panel" aria-label="Cover controls">
-    <section>
-      <h2>1 &middot; Photo</h2>
-      <label class="btn primary" for="photoInput">Upload a photo</label>
-      <input id="photoInput" type="file" accept="image/*" hidden>
-      <div class="row">
-        <button id="sampleBeach" type="button" class="btn">Beach sample</button>
-        <button id="sampleCity" type="button" class="btn">City sample</button>
+  <section class="stage-wrap">
+    <div class="stage-frame" id="dropzone">
+      <canvas id="cover" width="900" height="900"></canvas>
+      <div class="stage-hint" id="stage-hint">Drop a photo here, or pick a sample above. Click a panel to select it, drag to move the photo, scroll to zoom.</div>
+    </div>
+    <div class="stage-meta">
+      <span id="panel-label">Panel 1 of 1 selected</span>
+      <span id="size-label">Canvas 1080 × 1080</span>
+    </div>
+  </section>
+
+  <aside class="controls">
+    <section class="group">
+      <h2>Layout</h2>
+      <div class="seg" id="layout-seg" role="group" aria-label="Panel layout">
+        <button type="button" data-layout="solo" class="active">Solo</button>
+        <button type="button" data-layout="duo">Duo</button>
+        <button type="button" data-layout="trio">Trio</button>
+        <button type="button" data-layout="quad">Quad</button>
       </div>
-      <p id="photoName" class="muted">No photo yet &mdash; pick a sample or upload your own.</p>
+      <p class="note">Click a panel on the cover to select it. Each panel keeps its own photo, zoom and position.</p>
     </section>
 
-    <section>
-      <h2>2 &middot; Panels</h2>
-      <div class="seg" role="group" aria-label="Layout">
-        <button type="button" class="layout-btn" data-layout="solo" title="One full panel">Solo</button>
-        <button type="button" class="layout-btn" data-layout="duo" title="Two panels">Duo</button>
-        <button type="button" class="layout-btn" data-layout="trio" title="Hero plus two panels">Trio</button>
-        <button type="button" class="layout-btn" data-layout="quad" title="Four panels">Quad</button>
-      </div>
-      <p class="muted">Click a panel on the cover to select it, then drag it to move the photo and scroll to zoom.</p>
-    </section>
-
-    <section>
-      <h2>3 &middot; Colour grade</h2>
-      <div class="seg" role="group" aria-label="Colour grade">
-        <button type="button" class="grade-btn" data-grade="sunset">Sunset</button>
-        <button type="button" class="grade-btn" data-grade="neon">Neon</button>
-        <button type="button" class="grade-btn" data-grade="vice">Vice</button>
-        <button type="button" class="grade-btn" data-grade="noir">Noir</button>
+    <section class="group">
+      <h2>Colour grade</h2>
+      <div class="seg wrap" id="grade-seg" role="group" aria-label="Colour grade">
+        <button type="button" data-grade="sunset" class="active">Sunset</button>
+        <button type="button" data-grade="neon">Neon</button>
+        <button type="button" data-grade="vice">Vice</button>
+        <button type="button" data-grade="noir">Noir</button>
       </div>
     </section>
 
-    <section>
-      <h2>4 &middot; Caption</h2>
+    <section class="group">
+      <h2>Selected panel photo</h2>
+      <label class="row">Zoom
+        <input id="zoom" type="range" min="1" max="3" step="0.01" value="1">
+        <output id="zoom-out">1.00×</output>
+      </label>
+      <label class="row">Move X
+        <input id="panx" type="range" min="-0.5" max="0.5" step="0.01" value="0">
+        <output id="panx-out">0</output>
+      </label>
+      <label class="row">Move Y
+        <input id="pany" type="range" min="-0.5" max="0.5" step="0.01" value="0">
+        <output id="pany-out">0</output>
+      </label>
+      <button class="btn small" id="reset-panel" type="button">Reset panel framing</button>
+    </section>
+
+    <section class="group">
+      <h2>Caption</h2>
       <label class="field">Title
-        <input id="titleInput" type="text" maxlength="28" value="SUNSET HEIST" autocomplete="off">
+        <input id="title" type="text" value="SUNSET HEIST" maxlength="28" autocomplete="off">
       </label>
       <label class="field">Subtitle
-        <input id="subtitleInput" type="text" maxlength="48" value="VICE CITY &bull; EST. 2026" autocomplete="off">
+        <input id="subtitle" type="text" value="VICE CITY • 2026" maxlength="40" autocomplete="off">
       </label>
-      <div class="row">
-        <label class="field grow">Lettering
-          <select id="fontSelect">
-            <option value="anton" selected>Anton &mdash; heavy block</option>
-            <option value="bebas">Bebas Neue &mdash; tall caps</option>
-          </select>
-        </label>
-        <div class="field">Ink
-          <div class="swatches" role="group" aria-label="Title colour">
-            <button type="button" class="color-btn" data-color="#ffd23f" style="--c:#ffd23f" title="Gold" aria-label="Gold"></button>
-            <button type="button" class="color-btn" data-color="#ff2d78" style="--c:#ff2d78" title="Hot pink" aria-label="Hot pink"></button>
-            <button type="button" class="color-btn" data-color="#00e5ff" style="--c:#00e5ff" title="Cyan" aria-label="Cyan"></button>
-            <button type="button" class="color-btn" data-color="#ffffff" style="--c:#ffffff" title="White" aria-label="White"></button>
-          </div>
+      <label class="field">Lettering
+        <select id="font">
+          <option value="Anton">Anton — heavy block</option>
+          <option value="Bebas Neue">Bebas Neue — tall condensed</option>
+        </select>
+      </label>
+      <div class="field">Ink
+        <div class="swatches" id="inks">
+          <button type="button" data-ink="#ffffff" class="sw active" style="--c:#ffffff" aria-label="White"></button>
+          <button type="button" data-ink="#ffd166" class="sw" style="--c:#ffd166" aria-label="Gold"></button>
+          <button type="button" data-ink="#ff5d8f" class="sw" style="--c:#ff5d8f" aria-label="Hot pink"></button>
+          <button type="button" data-ink="#4dd8ff" class="sw" style="--c:#4dd8ff" aria-label="Cyan"></button>
         </div>
       </div>
+      <label class="check"><input id="outline" type="checkbox" checked> Thick black outline</label>
+      <label class="check"><input id="shadow" type="checkbox" checked> Drop shadow</label>
     </section>
 
-    <section>
-      <h2>5 &middot; Selected panel</h2>
-      <p id="panelLabel" class="muted">Panel 1 of 3</p>
-      <label class="field">Zoom
-        <input id="zoomRange" type="range" min="1" max="3" step="0.01" value="1.2">
+    <section class="group">
+      <h2>Export</h2>
+      <label class="field">Post size
+        <select id="size">
+          <option value="1080x1080">1080 × 1080 — square post</option>
+          <option value="1080x1350">1080 × 1350 — portrait post</option>
+          <option value="1920x1080">1920 × 1080 — wide banner</option>
+        </select>
       </label>
-      <label class="field">Move sideways
-        <input id="panXRange" type="range" min="-0.5" max="0.5" step="0.01" value="0">
-      </label>
-      <label class="field">Move up / down
-        <input id="panYRange" type="range" min="-0.5" max="0.5" step="0.01" value="0">
-      </label>
-      <button id="resetPanel" type="button" class="btn">Reset this panel</button>
-    </section>
-
-    <section>
-      <h2>6 &middot; Export</h2>
-      <div class="seg" role="group" aria-label="Export size">
-        <button type="button" class="size-btn" data-size="1080x1080">1080 &times; 1080</button>
-        <button type="button" class="size-btn" data-size="1080x1350">1080 &times; 1350</button>
-        <button type="button" class="size-btn" data-size="1920x1080">1920 &times; 1080</button>
-      </div>
-      <button id="exportBtn" type="button" class="btn primary big">Export PNG</button>
-      <p class="muted">The PNG downloads straight to your machine. Nothing is uploaded anywhere.</p>
+      <button class="btn primary block" id="export" type="button">Preview &amp; export PNG</button>
+      <p class="note">Preview first, then download. The PNG is rendered at full post size.</p>
     </section>
   </aside>
-
-  <section class="stage" id="dropZone" aria-label="Cover preview">
-    <canvas id="coverCanvas" width="1080" height="1080"></canvas>
-    <p id="hint" class="hint">Drop a photo anywhere here, or pick a sample on the left.</p>
-  </section>
 </main>
 
-<div id="previewModal" class="modal" hidden>
+<div class="modal" id="modal" hidden>
   <div class="modal-card">
     <h2>Your cover is ready</h2>
-    <img id="previewImg" alt="Exported cover art preview">
-    <div class="row">
-      <a id="previewDownload" class="btn primary" download="neon-vice-cover.png">Download PNG</a>
-      <button id="previewClose" type="button" class="btn">Keep editing</button>
+    <img id="preview-img" alt="Exported cover preview">
+    <p id="preview-meta"></p>
+    <div class="modal-actions">
+      <a class="btn primary" id="download" download="neon-vice-cover.png">Download PNG</a>
+      <button class="btn" id="close-modal" type="button">Keep editing</button>
     </div>
   </div>
 </div>
 
 <footer class="foot">
-  <p>Neon Vice Cover Studio &mdash; sample photos: beach at sunset (CC0) and a city at dusk (Picsum / Unsplash licence). Lettering: Anton and Bebas Neue under the SIL Open Font License. No Rockstar Games artwork, logos or fonts are used.</p>
+  <p>Neon Vice Cover Studio — fan-made poster tool. Not affiliated with Rockstar Games. Photos, fonts (Anton &amp; Bebas Neue, SIL OFL) and all art are original or openly licensed; no Rockstar artwork, logos or fonts are used.</p>
 </footer>
 
-<script type="module" src="src/main.js"></script>
+<script src="src/main.js"></script>
 </body>
 </html>
