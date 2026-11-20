@@ -1,46 +1,51 @@
-// Tiny static server for trying the app locally (Node 22, stdlib only).
-// Serves app/ at http://localhost:8080 — open it in desktop Chrome.
-// Usage: node serve.ts [port]
-
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = join(fileURLToPath(new URL('.', import.meta.url)), 'app');
-const port = Number(process.argv[2] || 8080);
+// Tiny static file server for local testing of Neon Vice Cover Studio.
+// Serves this repository on http://localhost:8080 — open
+// http://localhost:8080/app/index.html in desktop Chrome.
 
-const types = {
-  '.html': 'text/html',
-  '.js': 'text/javascript',
-  '.mjs': 'text/javascript',
-  '.css': 'text/css',
+const root = resolve(fileURLToPath(new URL('.', import.meta.url)));
+
+const TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.svg': 'image/svg+xml',
   '.ttf': 'font/ttf',
-  '.txt': 'text/plain',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.txt': 'text/plain; charset=utf-8',
 };
 
 const server = createServer(async (req, res) => {
-  let raw = decodeURIComponent(req.url.split('?')[0] || '/');
-  if (raw === '/') raw = '/index.html';
-  const path = normalize(join(root, raw));
-  if (!path.startsWith(root)) {
-    res.writeHead(403);
-    res.end();
-    return;
-  }
   try {
-    const body = await readFile(path);
-    res.writeHead(200, { 'content-type': types[extname(path)] || 'application/octet-stream' });
-    res.end(body);
+    const url = new URL(req.url || '/', 'http://localhost:8080');
+    let path = decodeURIComponent(url.pathname);
+    if (path === '/') path = '/app/index.html';
+    const file = resolve(join(root, normalize(path)));
+    if (!file.startsWith(root + sep) && file !== root) {
+      res.writeHead(403);
+      res.end('Forbidden');
+      return;
+    }
+    const data = await readFile(file);
+    res.writeHead(200, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream' });
+    res.end(data);
   } catch {
     res.writeHead(404);
-    res.end('not found');
+    res.end('Not found');
   }
 });
 
-server.listen(port, () => {
-  console.log(`Neon Vice Cover Studio at http://localhost:${port}`);
+server.listen(8080, () => {
+  console.log('Neon Vice Cover Studio at http://localhost:8080/app/index.html');
 });

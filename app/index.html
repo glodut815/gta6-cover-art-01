@@ -3,87 +3,125 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Neon Vice Cover Studio — GTA-style cover art maker</title>
+<title>Neon Vice Cover Studio</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">
-    <span class="brand-mark">NV</span>
-    <div>
-      <h1>NEON VICE <span>Cover Studio</span></h1>
-      <p class="tagline">Turn any photo into GTA-style cover art — offline, in your browser.</p>
-    </div>
+<header class="top">
+  <div>
+    <h1>Neon Vice <span>Cover Studio</span></h1>
+    <p class="tagline">Turn any photo and a caption into GTA-style cover art. Your photos never leave this machine.</p>
   </div>
-  <div class="top-actions">
-    <button id="exportOne" class="btn primary">Export PNG</button>
-    <button id="exportAll" class="btn">Export all 3 sizes</button>
-  </div>
+  <div class="top-badge">OFFLINE &middot; PNG EXPORT</div>
 </header>
 
-<main class="layout">
-  <aside class="controls" id="controls">
+<main class="workspace">
+  <aside class="panel" aria-label="Cover controls">
     <section>
-      <h2>1 · Photos</h2>
-      <div id="dropZone" class="drop" role="button" tabindex="0">
-        Drop photos here, or click to choose
-        <span class="hint">JPG / PNG, kept on your machine — nothing is uploaded.</span>
+      <h2>1 &middot; Photo</h2>
+      <label class="btn primary" for="photoInput">Upload a photo</label>
+      <input id="photoInput" type="file" accept="image/*" hidden>
+      <div class="row">
+        <button id="sampleBeach" type="button" class="btn">Beach sample</button>
+        <button id="sampleCity" type="button" class="btn">City sample</button>
       </div>
-      <input type="file" id="fileInput" accept="image/*" multiple hidden>
-      <button id="loadSamples" class="btn wide">Load the two sample photos</button>
-      <p class="status" id="photoCount">No photos yet</p>
+      <p id="photoName" class="muted">No photo yet &mdash; pick a sample or upload your own.</p>
     </section>
 
     <section>
-      <h2>2 · Layout</h2>
-      <div class="picker" id="layoutPicker"></div>
+      <h2>2 &middot; Panels</h2>
+      <div class="seg" role="group" aria-label="Layout">
+        <button type="button" class="layout-btn" data-layout="solo" title="One full panel">Solo</button>
+        <button type="button" class="layout-btn" data-layout="duo" title="Two panels">Duo</button>
+        <button type="button" class="layout-btn" data-layout="trio" title="Hero plus two panels">Trio</button>
+        <button type="button" class="layout-btn" data-layout="quad" title="Four panels">Quad</button>
+      </div>
+      <p class="muted">Click a panel on the cover to select it, then drag it to move the photo and scroll to zoom.</p>
     </section>
 
     <section>
-      <h2>3 · Grade</h2>
-      <div class="picker" id="gradePicker"></div>
+      <h2>3 &middot; Colour grade</h2>
+      <div class="seg" role="group" aria-label="Colour grade">
+        <button type="button" class="grade-btn" data-grade="sunset">Sunset</button>
+        <button type="button" class="grade-btn" data-grade="neon">Neon</button>
+        <button type="button" class="grade-btn" data-grade="vice">Vice</button>
+        <button type="button" class="grade-btn" data-grade="noir">Noir</button>
+      </div>
     </section>
 
     <section>
-      <h2>4 · Caption</h2>
+      <h2>4 &middot; Caption</h2>
       <label class="field">Title
-        <input id="titleInput" type="text" value="SUNSET HEIST" maxlength="24" spellcheck="false">
+        <input id="titleInput" type="text" maxlength="28" value="SUNSET HEIST" autocomplete="off">
       </label>
       <label class="field">Subtitle
-        <input id="subtitleInput" type="text" value="Vice City nights" maxlength="40" spellcheck="false">
+        <input id="subtitleInput" type="text" maxlength="48" value="VICE CITY &bull; EST. 2026" autocomplete="off">
       </label>
+      <div class="row">
+        <label class="field grow">Lettering
+          <select id="fontSelect">
+            <option value="anton" selected>Anton &mdash; heavy block</option>
+            <option value="bebas">Bebas Neue &mdash; tall caps</option>
+          </select>
+        </label>
+        <div class="field">Ink
+          <div class="swatches" role="group" aria-label="Title colour">
+            <button type="button" class="color-btn" data-color="#ffd23f" style="--c:#ffd23f" title="Gold" aria-label="Gold"></button>
+            <button type="button" class="color-btn" data-color="#ff2d78" style="--c:#ff2d78" title="Hot pink" aria-label="Hot pink"></button>
+            <button type="button" class="color-btn" data-color="#00e5ff" style="--c:#00e5ff" title="Cyan" aria-label="Cyan"></button>
+            <button type="button" class="color-btn" data-color="#ffffff" style="--c:#ffffff" title="White" aria-label="White"></button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section>
-      <h2>5 · Selected panel</h2>
-      <p class="status" id="panelLabel">Panel 1 of 4</p>
-      <p class="hint">Click a panel in the preview to select it. Drag to move the photo, scroll to zoom.</p>
-      <label class="field">Photo in this panel
-        <select id="panelPhoto"></select>
+      <h2>5 &middot; Selected panel</h2>
+      <p id="panelLabel" class="muted">Panel 1 of 3</p>
+      <label class="field">Zoom
+        <input id="zoomRange" type="range" min="1" max="3" step="0.01" value="1.2">
       </label>
-      <label class="field">Zoom <span id="zoomVal">115%</span>
-        <input id="panelZoom" type="range" min="1" max="3" step="0.05" value="1.15">
+      <label class="field">Move sideways
+        <input id="panXRange" type="range" min="-0.5" max="0.5" step="0.01" value="0">
       </label>
+      <label class="field">Move up / down
+        <input id="panYRange" type="range" min="-0.5" max="0.5" step="0.01" value="0">
+      </label>
+      <button id="resetPanel" type="button" class="btn">Reset this panel</button>
     </section>
 
     <section>
-      <h2>6 · Export size</h2>
-      <div class="picker" id="sizePicker"></div>
-      <label class="check"><input type="checkbox" id="frameToggle" checked> White poster frame</label>
-      <label class="check"><input type="checkbox" id="grainToggle" checked> Film grain + vignette</label>
+      <h2>6 &middot; Export</h2>
+      <div class="seg" role="group" aria-label="Export size">
+        <button type="button" class="size-btn" data-size="1080x1080">1080 &times; 1080</button>
+        <button type="button" class="size-btn" data-size="1080x1350">1080 &times; 1350</button>
+        <button type="button" class="size-btn" data-size="1920x1080">1920 &times; 1080</button>
+      </div>
+      <button id="exportBtn" type="button" class="btn primary big">Export PNG</button>
+      <p class="muted">The PNG downloads straight to your machine. Nothing is uploaded anywhere.</p>
     </section>
-
-    <p class="fineprint">Original lettering (Anton &amp; Pacifico, SIL Open Font License).
-    No Rockstar logo, artwork or fonts. Photos stay on your machine.</p>
   </aside>
 
-  <section class="stage" id="previewBox">
-    <canvas id="preview" width="960" height="540"></canvas>
-    <p class="stage-hint">Live preview — click a panel to edit it, drag to pan, scroll to zoom.</p>
+  <section class="stage" id="dropZone" aria-label="Cover preview">
+    <canvas id="coverCanvas" width="1080" height="1080"></canvas>
+    <p id="hint" class="hint">Drop a photo anywhere here, or pick a sample on the left.</p>
   </section>
 </main>
 
-<canvas id="shotCanvas" class="shot-canvas" hidden></canvas>
+<div id="previewModal" class="modal" hidden>
+  <div class="modal-card">
+    <h2>Your cover is ready</h2>
+    <img id="previewImg" alt="Exported cover art preview">
+    <div class="row">
+      <a id="previewDownload" class="btn primary" download="neon-vice-cover.png">Download PNG</a>
+      <button id="previewClose" type="button" class="btn">Keep editing</button>
+    </div>
+  </div>
+</div>
+
+<footer class="foot">
+  <p>Neon Vice Cover Studio &mdash; sample photos: beach at sunset (CC0) and a city at dusk (Picsum / Unsplash licence). Lettering: Anton and Bebas Neue under the SIL Open Font License. No Rockstar Games artwork, logos or fonts are used.</p>
+</footer>
 
 <script type="module" src="src/main.js"></script>
 </body>
